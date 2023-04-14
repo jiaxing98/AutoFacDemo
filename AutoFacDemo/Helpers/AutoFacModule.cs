@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using AutoFacDemo.Data;
 using AutoFacDemo.Repositories;
 using AutoMapper;
@@ -9,6 +8,17 @@ namespace AutoFacDemo.Helpers
 {
     public class AutoFacModule : Module
     {
+        private readonly IConfiguration _configuration;
+        private readonly IServiceCollection _serviceCollection;
+        private readonly IServiceProvider _serviceProvider;
+
+        public AutoFacModule(IConfiguration configuration, IServiceCollection serviceCollection)
+        {
+            _configuration = configuration;
+            _serviceCollection = serviceCollection;
+            _serviceProvider = _serviceCollection.BuildServiceProvider();
+        }
+
         protected override void Load(ContainerBuilder builder)
         {
             // automapper
@@ -23,9 +33,7 @@ namespace AutoFacDemo.Helpers
             // mongodb settings
             builder.Register(c =>
             {
-                var context = c.Resolve<IComponentContext>();
-                var sp = context.Resolve<IServiceProvider>();
-                return sp.GetRequiredService<IOptions<MongoDBSettings>>().Value;
+                return _serviceProvider.GetRequiredService<IOptions<MongoDBSettings>>().Value;
             })
             .As<IMongoDBSettings>()
             .SingleInstance();

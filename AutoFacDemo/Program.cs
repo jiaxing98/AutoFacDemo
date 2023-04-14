@@ -25,7 +25,8 @@ var mongodbSettings = builder.Configuration.GetSection(nameof(MongoDBSettings));
 builder.Services.Configure<MongoDBSettings>(mongodbSettings);
 
 // autofac container
-builder.Host.ConfigureContainer<ContainerBuilder>(container => container.RegisterModule(new AutoFacModule()));
+builder.Host.ConfigureContainer<ContainerBuilder>(container =>
+    container.RegisterModule(new AutoFacModule(builder.Configuration, builder.Services)));
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
 var app = builder.Build();
